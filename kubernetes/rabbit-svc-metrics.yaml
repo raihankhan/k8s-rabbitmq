@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-metrics
+spec:
+  clusterIP: None
+  ports:
+    - port: 15692
+      targetPort: 15692
+      name: discovery
+  selector:
+    app: rabbitmq

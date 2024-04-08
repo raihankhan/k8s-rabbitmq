@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq-consumer
+  namespace: rabbit
+  labels:
+    app: rabbitmq-consumer
+spec:
+  selector:
+    matchLabels:
+      app: rabbitmq-consumer
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rabbitmq-consumer
+    spec:
+      containers:
+        - name: rabbitmq-consumer
+          image: raihankhanraka/rabbit-consumer:0.1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          env:
+            - name: RABBIT_HOST
+              value: "fast-black-prawn.rmq6.cloudamqp.com"
+            - name: RABBIT_VHOST
+              value: "fiykjdln"
+            - name: RABBIT_PORT
+              value: "5672"
+            - name: RABBIT_QUEUE
+              value: "queue-one"
+            - name: RABBIT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-remote-cred
+                  key: username
+            - name: RABBIT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-remote-cred
+                  key: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-consumer
+  namespace: rabbit
+  labels:
+    app: rabbitmq-consumer
+spec:
+  clusterIP: None
+  selector:
+    app: rabbitmq-consumer
+  ports:
+    - protocol: TCP
+      name: http
+      port: 80
+      targetPort: 80
