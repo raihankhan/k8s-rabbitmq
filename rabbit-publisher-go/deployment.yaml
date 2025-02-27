@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rabbitmq-publisher
+  name: rabbitmq-publisher-f
   namespace: rabbit
   labels:
     app: rabbitmq-publisher
@@ -17,33 +17,40 @@ spec:
     spec:
       containers:
         - name: rabbitmq-publisher
-          image: raihankhanraka/rabbit-publisher:0.1
+          image: raihankhanraka/rabbit-publisher:0.4
           imagePullPolicy: Always
           ports:
             - containerPort: 80
           env:
             - name: RABBIT_HOST
-              value: "fast-black-prawn.rmq6.cloudamqp.com"
+              value: "rabbitmq-green.rabbit.svc.cluster.local"
             - name: RABBIT_VHOST
-              value: "fiykjdln"
+              value: "/"
             - name: RABBIT_PORT
               value: "5672"
             - name: RABBIT_QUEUE
-              value: "queue-one"
+              value: "queue-two"
             - name: RABBIT_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: rabbitmq-remote-cred
+                  name: rabbitmq-green-admin-cred
                   key: username
             - name: RABBIT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: rabbitmq-remote-cred
+                  name: rabbitmq-green-admin-cred
                   key: password
             - name: RABBIT_QUEUE_TYPE
               value: "quorum"
             - name: RABBIT_PUBLISH_INTERVAL
-              value: "5"
+              value: "10"
+            - name: MESSAGE_EACH_BATCH
+              value: "10"
+            - name: RAND_MSG_SIZE_IN_MB
+              value: "1"
+            - name: CLOSE_MSG_LOG
+              value: "true"
+
 ---
 apiVersion: v1
 kind: Service
